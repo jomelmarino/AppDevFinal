@@ -14,7 +14,7 @@ A simple React Native application.
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/SSL-ACTX/techvanguard.git
+   git clone https://github.com/jomelmarino/AppDevFinal.git
    cd techvanguard
    ```
 
