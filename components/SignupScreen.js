@@ -1,10 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const SignupScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [fontsLoaded, setFontsLoaded] = useState(false);
+
+    useEffect(() => {
+        const loadFonts = async () => {
+        try {
+            setFontsLoaded(true);
+        } catch (error) {
+            console.error("Error loading fonts:", error);
+        }
+        };
+        loadFonts();
+    }, []);
+
+    const isFormValid = () =>
+        email.includes("@") && password === confirmPassword && password.length >= 8;
+
+    const handleSignup = async () => {
+        if (!isFormValid()) {
+        Alert.alert(
+            "Try again",
+            "Please enter a valid email and matching passwords with at least 8 characters"
+        );
+        return;
+        }
+
+        try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        if (user) {
+            Alert.alert("Success", "Account created successfully");
+            setEmail("");
+            setPassword("");
+            
+            setConfirmPassword("");
+            navigation.navigate("LoginScreen");
+            navigation.reset({
+            index: 0,
+            routes: [{name: 'LoginScreen'}],
+            });
+        }
+        } catch (error) {
+        if (error.code === "auth/email-already-in-use") {
+            Alert.alert("Error", "Email address already in use");
+        } else {
+            Alert.alert("Error", "Error creating user: ${error.message}");
+        }
+        }
+      };
+        
+      if (!fontsLoaded) {
+          return null; // or a loading spinner
+      }
 
   return (
     <View style={styles.container}>
@@ -63,7 +118,7 @@ const SignupScreen = ({ navigation }) => {
         <Text style={styles.loginButtonText}>Sign up</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+      <TouchableOpacity onPress={(handleSignup)}>
         <Text style={styles.signupText}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
