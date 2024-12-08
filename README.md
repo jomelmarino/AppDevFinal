@@ -1,4 +1,4 @@
-# TechVanguard
+#AppDev Final
 
 A simple React Native application.
 
